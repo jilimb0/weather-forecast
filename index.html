@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style/style.css" />
+    <link rel="stylesheet" href="./style/lightmode.css" id="theme" />
+    <script src="./scripts/skycons.js"></script>
+    <script src="./scripts/app.js"></script>
+    <title>Weather</title>
+  </head>
+  <body>
+    <button id="theme-switcher">Dark</button>
+    <div class="weather-container">
+      <div class="weather today" id="weather">
+        <div class="location">
+          <h1 class="location-timezone1">Timezone</h1>
+          <canvas
+            id="icon-today"
+            class="icon"
+            width="100"
+            height="100"
+          ></canvas>
+        </div>
+        <div class="temperature today">
+          <div class="degree-section today">
+            <p>Temperature</p>
+            <h2 class="temperature-degree today">0</h2>
+            <span>C</span>
+          </div>
+          <div class="degree-feels-like-section today">
+            <p>Feels like</p>
+            <h2 class="temperature-feels-like today">0</h2>
+            <span>C</span>
+          </div>
+          <!-- <div class="temperature-description today">It's so cold</div> -->
+        </div>
+      </div>
+
+      <div class="weather tomorrow" id="weather">
+        <div class="location">
+          <h1 class="location-timezone2">Timezone</h1>
+          <canvas
+            id="icon-tomorrow"
+            class="icon"
+            width="100"
+            height="100"
+          ></canvas>
+        </div>
+        <div class="temperature tomorrow">
+          <div class="degree-section tomorrow">
+            <p>Temperature</p>
+            <h2 class="temperature-degree tomorrow">0</h2>
+            <span>C</span>
+          </div>
+          <div class="degree-feels-like-section tomorrow">
+            <p>Feels like</p>
+            <h2 class="temperature-feels-like tomorrow">0</h2>
+            <span>C</span>
+          </div>
+          <!-- <div class="temperature-description tomorrow">It's so cold</div> -->
+        </div>
+      </div>
+
+      <div class="weather day-after-tomorrow" id="weather">
+        <div class="location">
+          <h1 class="location-timezone3">Timezone</h1>
+          <canvas
+            id="icon-day-after-tomorrow"
+            class="icon"
+            width="100"
+            height="100"
+          ></canvas>
+        </div>
+        <div class="temperature day-after-tomorrow">
+          <div class="degree-section day-after-tomorrow">
+            <p>Temperature</p>
+            <h2 class="temperature-degree day-after-tomorrow">0</h2>
+            <span>C</span>
+          </div>
+          <div class="degree-feels-like-section day-after-tomorrow">
+            <p>Feels like</p>
+            <h2 class="temperature-feels-like day-after-tomorrow">0</h2>
+            <span>C</span>
+          </div>
+          <!-- <div class="temperataure-description day-after-tomorrow">It's so cold</div> -->
+        </div>
+      </div>
+    </div>
+    <script src="./scripts/switcher.js"></script>
+  </body>
+</html>

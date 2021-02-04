@@ -1,0 +1,77 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  transition: 1s;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+
+#theme-switcher {
+  position: absolute;
+  top: 10vh;
+  padding: 0.5% 1%;
+  font-size: 0.9vw;
+  border-radius: 20px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+.weather:hover {
+  color: white;
+  font-size: 1.3vw;
+}
+
+.weather-container {
+  transition: 1s;
+  display: grid;
+  justify-items: center;
+  grid-template: 1fr / repeat(3, 23vw);
+}
+
+/* .icon {
+  color: rgba(255, 255, 255, 0.5);
+} */
+
+.location,
+.temperature {
+  height: 20vh;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.temperature {
+  flex-direction: column;
+}
+
+.degree-section,
+.degree-feels-like-section {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-around;
+  width: 65%;
+}
+
+.degree-feels-like-section {
+  width: 65%;
+}
+
+.degree-section span {
+  margin: 10px;
+  font-size: 30px;
+}
+
+.degree-section h2 {
+  font-size: 40px;
+}
