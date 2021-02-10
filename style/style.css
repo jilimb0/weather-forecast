@@ -1,0 +1,145 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+:focus {
+  outline: none;
+}
+
+body {
+  transition: 1s;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+
+#buttons-container {
+  position: absolute;
+  top: 3vh;
+  display: flex;
+  justify-content: center;
+  max-width: 50vw;
+}
+.lang-switcher {
+  cursor: pointer;
+  border-radius: 1.5vw;
+  font-size: 1.5vw;
+
+  border: 0;
+  margin: 0 5%;
+  padding: 3% 10%;
+
+  background-color: transparent;
+  opacity: 0.5;
+}
+
+#theme-switcher {
+  position: absolute;
+  top: 15vh;
+  padding: 0.5% 1%;
+  font-size: 1.5vw;
+  border-radius: 1.5vw;
+  border: none;
+  cursor: pointer;
+}
+
+.weather-container {
+  transition: 1s;
+  display: grid;
+  justify-items: center;
+  grid-template: 1fr / repeat(3, 25vw);
+  cursor: default;
+}
+.weather-title {
+  text-align: center;
+  font-size: 1.5vw;
+  color: white;
+}
+
+.location,
+.temperature {
+  height: 20vh;
+  display: flex;
+  align-items: center;
+}
+.location h1 {
+  margin: 0 10% 0 0;
+}
+.temperature {
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-start;
+}
+.temperature p {
+  margin: 0 10% 0 0;
+}
+
+.degree-section,
+.degree-feels-like-section {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin: 0 0 0 2%;
+}
+
+.degree-feels-like-section {
+  width: 85%;
+}
+.degree-feels-like-section span {
+  margin: 7px;
+}
+.degree-section span {
+  margin: 7px;
+  font-size: 30px;
+}
+
+.degree-section h2 {
+  font-size: 40px;
+}
+
+@media screen and (min-width: 600px) {
+  .weather:hover {
+    color: white;
+    font-size: 1.3vw;
+  }
+  .weather-title {
+    pointer-events: none;
+  }
+}
+@media screen and (max-width: 600px) and (orientation: portrait) {
+  .lang-switcher {
+    font-size: 3vh;
+    margin: 0;
+  }
+  #theme-switcher {
+    border-radius: 3vh;
+    font-size: 3vh;
+    padding: 1.5% 3%;
+  }
+
+  .weather-title {
+    font-size: 3vh;
+    cursor: pointer;
+  }
+  .weather {
+    margin: 0 0 0 50vw;
+  }
+  #weather-today {
+  }
+  #weather-tomorrow {
+    display: none;
+  }
+  #weather-day-after-tomorrow {
+    display: none;
+  }
+  .weather-title {
+    width: 65vw;
+  }
+}

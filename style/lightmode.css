@@ -1,0 +1,15 @@
+body {
+  background: linear-gradient(rgb(47, 150, 163), rgb(48, 62, 143));
+}
+#theme-switcher {
+  background-color: transparent;
+  color: #fff;
+}
+#theme-switcher:hover {
+  background-color: #7f5a83;
+  background-image: linear-gradient(315deg, #7f5a83 0%, #0d324d 74%);
+}
+.lang-switcher:hover {
+  color: #7f5a83;
+  opacity: 1;
+}
