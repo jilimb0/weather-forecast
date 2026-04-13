@@ -3,90 +3,119 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Simple 3-day weather forecast app using your current location."
+    />
+    <meta name="theme-color" content="#1d2f60" />
     <link rel="stylesheet" href="./style/style.css" />
     <link rel="stylesheet" href="./style/lightmode.css" id="theme" />
-    <script src="./scripts/skycons.js"></script>
-    <script src="./scripts/app.js"></script>
-    <title>Weather</title>
+    <script src="./scripts/skycons.js" defer></script>
+    <script src="./scripts/app.js" defer></script>
+    <script src="./scripts/switcher.js" defer></script>
+    <title>Weather Forecast</title>
   </head>
   <body>
-    <button id="theme-switcher">Dark</button>
-    <div class="weather-container">
-      <div class="weather today" id="weather">
+    <a class="skip-link" href="#weather-main">Skip to forecast</a>
+    <button id="theme-switcher" type="button" aria-label="Toggle theme">Dark</button>
+
+    <main class="weather-container" id="weather-main" aria-live="polite">
+      <p id="status" class="status" role="status">Loading weather...</p>
+
+      <section class="weather today" id="weather-today" aria-label="Today weather">
         <div class="location">
-          <h1 class="location-timezone1">Timezone</h1>
+          <h1 class="location-timezone" data-day="today">Location</h1>
           <canvas
             id="icon-today"
             class="icon"
             width="100"
             height="100"
+            aria-label="Today weather icon"
           ></canvas>
         </div>
         <div class="temperature today">
-          <div class="degree-section today">
+          <button class="degree-section today" type="button" aria-label="Toggle today temperature unit">
             <p>Temperature</p>
-            <h2 class="temperature-degree today">0</h2>
-            <span>C</span>
-          </div>
-          <div class="degree-feels-like-section today">
+            <h2 class="temperature-degree today">--</h2>
+            <span aria-hidden="true">C</span>
+          </button>
+          <button
+            class="degree-feels-like-section today"
+            type="button"
+            aria-label="Toggle today feels-like unit"
+          >
             <p>Feels like</p>
-            <h2 class="temperature-feels-like today">0</h2>
-            <span>C</span>
-          </div>
-          <!-- <div class="temperature-description today">It's so cold</div> -->
+            <h2 class="temperature-feels-like today">--</h2>
+            <span aria-hidden="true">C</span>
+          </button>
         </div>
-      </div>
+      </section>
 
-      <div class="weather tomorrow" id="weather">
+      <section class="weather tomorrow" id="weather-tomorrow" aria-label="Tomorrow weather">
         <div class="location">
-          <h1 class="location-timezone2">Timezone</h1>
+          <h1 class="location-timezone" data-day="tomorrow">Location</h1>
           <canvas
             id="icon-tomorrow"
             class="icon"
             width="100"
             height="100"
+            aria-label="Tomorrow weather icon"
           ></canvas>
         </div>
         <div class="temperature tomorrow">
-          <div class="degree-section tomorrow">
+          <button class="degree-section tomorrow" type="button" aria-label="Toggle tomorrow temperature unit">
             <p>Temperature</p>
-            <h2 class="temperature-degree tomorrow">0</h2>
-            <span>C</span>
-          </div>
-          <div class="degree-feels-like-section tomorrow">
+            <h2 class="temperature-degree tomorrow">--</h2>
+            <span aria-hidden="true">C</span>
+          </button>
+          <button
+            class="degree-feels-like-section tomorrow"
+            type="button"
+            aria-label="Toggle tomorrow feels-like unit"
+          >
             <p>Feels like</p>
-            <h2 class="temperature-feels-like tomorrow">0</h2>
-            <span>C</span>
-          </div>
-          <!-- <div class="temperature-description tomorrow">It's so cold</div> -->
+            <h2 class="temperature-feels-like tomorrow">--</h2>
+            <span aria-hidden="true">C</span>
+          </button>
         </div>
-      </div>
+      </section>
 
-      <div class="weather day-after-tomorrow" id="weather">
+      <section
+        class="weather day-after-tomorrow"
+        id="weather-day-after-tomorrow"
+        aria-label="Day after tomorrow weather"
+      >
         <div class="location">
-          <h1 class="location-timezone3">Timezone</h1>
+          <h1 class="location-timezone" data-day="day-after-tomorrow">Location</h1>
           <canvas
             id="icon-day-after-tomorrow"
             class="icon"
             width="100"
             height="100"
+            aria-label="Day after tomorrow weather icon"
           ></canvas>
         </div>
         <div class="temperature day-after-tomorrow">
-          <div class="degree-section day-after-tomorrow">
+          <button
+            class="degree-section day-after-tomorrow"
+            type="button"
+            aria-label="Toggle day after tomorrow temperature unit"
+          >
             <p>Temperature</p>
-            <h2 class="temperature-degree day-after-tomorrow">0</h2>
-            <span>C</span>
-          </div>
-          <div class="degree-feels-like-section day-after-tomorrow">
+            <h2 class="temperature-degree day-after-tomorrow">--</h2>
+            <span aria-hidden="true">C</span>
+          </button>
+          <button
+            class="degree-feels-like-section day-after-tomorrow"
+            type="button"
+            aria-label="Toggle day after tomorrow feels-like unit"
+          >
             <p>Feels like</p>
-            <h2 class="temperature-feels-like day-after-tomorrow">0</h2>
-            <span>C</span>
-          </div>
-          <!-- <div class="temperataure-description day-after-tomorrow">It's so cold</div> -->
+            <h2 class="temperature-feels-like day-after-tomorrow">--</h2>
+            <span aria-hidden="true">C</span>
+          </button>
         </div>
-      </div>
-    </div>
-    <script src="./scripts/switcher.js"></script>
+      </section>
+    </main>
   </body>
 </html>

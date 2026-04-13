@@ -1,0 +1,31 @@
+{
+  "name": "weather-forecast",
+  "version": "1.1.0",
+  "description": "A lightweight 3-day weather forecast app built with plain HTML, CSS, and JavaScript.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/weather-forecast.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jilimb0/weather-forecast/issues"
+  },
+  "homepage": "https://github.com/jilimb0/weather-forecast#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.4"
+  }
+}
