@@ -19,6 +19,31 @@ function createMockRes() {
   };
 }
 
+function createForecastList() {
+  return [
+    {
+      dt: 1776242748,
+      main: { temp: 12, feels_like: 10 },
+      weather: [{ main: "Clouds" }],
+    },
+    {
+      dt: 1776253548,
+      main: { temp: 15, feels_like: 13 },
+      weather: [{ main: "Clear" }],
+    },
+    {
+      dt: 1776329148,
+      main: { temp: 16, feels_like: 14 },
+      weather: [{ main: "Rain" }],
+    },
+    {
+      dt: 1776339948,
+      main: { temp: 17, feels_like: 15 },
+      weather: [{ main: "Clouds" }],
+    },
+  ];
+}
+
 describe("parseCoordinate", () => {
   it("parses valid lat/lon", () => {
     expect(parseCoordinate("41.7", "lat")).toBe(41.7);
@@ -36,11 +61,20 @@ describe("weather handler", () => {
   it("returns proxied weather payload", async () => {
     const mockFetch = async (url) => {
       if (url.includes("/weather?")) {
-        return { ok: true, json: async () => ({ name: "Tbilisi" }) };
+        return {
+          ok: true,
+          json: async () => ({
+            name: "Tbilisi",
+            dt: 1776156348,
+            timezone: 14400,
+            main: { temp: 11, feels_like: 9 },
+            weather: [{ main: "Clouds" }],
+          }),
+        };
       }
       return {
         ok: true,
-        json: async () => ({ current: { temp: 10 }, daily: [{}, {}, {}] }),
+        json: async () => ({ list: createForecastList(), city: { timezone: 14400 } }),
       };
     };
 
@@ -52,7 +86,9 @@ describe("weather handler", () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body.currentData.name).toBe("Tbilisi");
-    expect(res.body.forecastData.current.temp).toBe(10);
+    expect(res.body.forecastData.current.temp).toBe(11);
+    expect(res.body.forecastData.daily[1].temp.day).toBe(12);
+    expect(res.body.forecastData.daily[2].temp.day).toBe(16);
   });
 
   it("returns 400 for bad lat", async () => {
