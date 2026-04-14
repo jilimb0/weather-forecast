@@ -5,6 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
+    "lint": "biome check .",
+    "format": "biome check --write .",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -16,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "packageManager": "pnpm@10.29.3",
   "bugs": {
     "url": "https://github.com/jilimb0/weather-forecast/issues"
   },
@@ -25,6 +28,7 @@
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.11",
     "supertest": "^7.2.2",
     "vitest": "^4.1.4"
   }

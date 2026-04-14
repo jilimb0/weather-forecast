@@ -33,7 +33,7 @@ For local development, `/api/weather` is served by Express. In Netlify productio
 1. Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 2. Create `.env` and set your key:
@@ -45,7 +45,7 @@ cp .env.example .env
 3. Start the app:
 
 ```bash
-npm start
+pnpm start
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000).
@@ -56,7 +56,7 @@ Use these settings in Netlify:
 
 - Branch to deploy: `main`
 - Base directory: *(empty)*
-- Build command: `npm ci`
+- Build command: `pnpm install --frozen-lockfile`
 - Publish directory: `.`
 - Functions directory: `netlify/functions`
 
@@ -68,9 +68,9 @@ Add this environment variable in Netlify project settings:
 
 ## Scripts
 
-- `npm start` - run local Express server
-- `npm test` - run tests once
-- `npm run test:watch` - run tests in watch mode
+- `pnpm start` - run local Express server
+- `pnpm test` - run tests once
+- `pnpm test:watch` - run tests in watch mode
 
 ## Security note
 

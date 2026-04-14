@@ -18,4 +18,5 @@ Ship a portfolio-ready weather app that deploys cleanly on Netlify without expos
 
 ## Risks
 - OpenWeather One Call endpoint availability depends on account tier.
+- Package manager is standardized on pnpm with Biome linting in CI.
 - Browser geolocation permissions can be denied by end users.
