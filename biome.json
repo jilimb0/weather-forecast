@@ -14,11 +14,12 @@
   },
   "files": {
     "includes": [
-      "scripts/app.js",
+      "scripts/app.mjs",
       "scripts/switcher.js",
       "src/**/*.js",
       "netlify/**/*.js",
       "tests/**/*.mjs",
+      "playwright.config.mjs",
       "*.json"
     ]
   }

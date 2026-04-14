@@ -1,3 +1,10 @@
-body {
-  background: linear-gradient(160deg, #2f96a3 0%, #2a5470 45%, #1d2f60 100%);
+:root {
+  --bg-start: #0d2a3f;
+  --bg-middle: #1a4f6e;
+  --bg-end: #29506a;
+  --panel-bg: rgba(255, 255, 255, 0.14);
+  --panel-border: rgba(255, 255, 255, 0.32);
+  --text-strong: #f6fbff;
+  --text-muted: #d0e6f5;
+  --text-accent: #9fe6ff;
 }

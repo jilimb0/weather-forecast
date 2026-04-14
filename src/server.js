@@ -1,39 +1,59 @@
 const express = require("express");
 const path = require("node:path");
-const { parseCoordinate, fetchWeatherPayload } = require("./weather-service");
+const { fetchWeatherPayload, geocodeCity, mapApiError, randomId } = require("./weather-service");
 
-function createWeatherHandler({ apiKey, fetchImpl = fetch }) {
+function createWeatherHandler({ apiKey, fetchImpl = fetch } = {}) {
   return async function weatherHandler(req, res) {
+    const requestId = req.headers["x-request-id"] || randomId();
+
     try {
-      const data = await fetchWeatherPayload({
+      const payload = await fetchWeatherPayload({
         apiKey,
         lat: req.query.lat,
         lon: req.query.lon,
         fetchImpl,
+        ipAddress: req.ip || "unknown",
+        requestId,
       });
 
-      res.status(200).json(data);
+      res
+        .status(200)
+        .set("Cache-Control", "public, max-age=60, stale-while-revalidate=240")
+        .json(payload);
     } catch (error) {
-      if (error.message.includes("must be")) {
-        res.status(400).json({ error: error.message });
-        return;
-      }
-
-      if (error.statusCode) {
-        res.status(error.statusCode).json({ error: error.message });
-        return;
-      }
-
-      console.error("/api/weather error", error);
-      res.status(500).json({ error: "Internal server error" });
+      const mapped = mapApiError(error, requestId);
+      res.status(mapped.statusCode).json(mapped.body);
     }
   };
 }
 
-function createApp({ apiKey, fetchImpl = fetch } = {}) {
+function createGeocodeHandler({ apiKey, fetchImpl = fetch } = {}) {
+  return async function geocodeHandler(req, res) {
+    const requestId = req.headers["x-request-id"] || randomId();
+
+    try {
+      const results = await geocodeCity({
+        apiKey,
+        query: req.query.q,
+        fetchImpl,
+      });
+      res.status(200).json({ results, requestId });
+    } catch (error) {
+      const mapped = mapApiError(error, requestId);
+      res.status(mapped.statusCode).json(mapped.body);
+    }
+  };
+}
+
+function createApp({ apiKey, fetchImpl = fetch, liveReloadMiddleware = null } = {}) {
   const app = express();
 
   app.use(express.json());
+
+  if (liveReloadMiddleware) {
+    app.get("/__live-reload", liveReloadMiddleware);
+  }
+
   app.use(express.static(path.join(__dirname, "..")));
 
   app.get("/health", (_req, res) => {
@@ -41,12 +61,13 @@ function createApp({ apiKey, fetchImpl = fetch } = {}) {
   });
 
   app.get("/api/weather", createWeatherHandler({ apiKey, fetchImpl }));
+  app.get("/api/geocode", createGeocodeHandler({ apiKey, fetchImpl }));
 
   return app;
 }
 
 module.exports = {
   createApp,
-  parseCoordinate,
   createWeatherHandler,
+  createGeocodeHandler,
 };

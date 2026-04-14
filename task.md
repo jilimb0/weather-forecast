@@ -4,15 +4,14 @@
 VALIDATE MODE
 
 ## Completed
-- Migrated package manager from npm to pnpm and removed npm/yarn lockfiles.
-- Integrated Biome linting and formatting scripts.
-- Added shared weather service logic (`src/weather-service.js`).
-- Added Netlify Function endpoint (`netlify/functions/weather.js`).
-- Added Netlify redirect config (`netlify.toml`).
-- Updated frontend to call `/api/weather` for both local and Netlify deploys.
-- Kept local Express server path for local dev.
-- Added tests for Express handler and Netlify function.
-- Updated README with exact Netlify settings.
+- Implemented v2 backend weather contract with location/current/hourly/daily/meta.
+- Added strict validation, rate limiting, timeout+retry, cache, and structured error mapping.
+- Added request-id aware structured logging.
+- Rebuilt frontend with modern editorial-glass design and responsive sections.
+- Added global unit persistence and retry/fallback UX.
+- Added PWA manifest, icons, and service worker.
+- Added frontend + backend tests and optional e2e smoke setup.
+- Updated CI quality workflow and documentation (README, ADRs, release checklist).
 
 ## Open Blockers
-- None.
+- Lighthouse budget thresholds and production URL integration are left as optional CI follow-up.

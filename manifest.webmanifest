@@ -1,0 +1,21 @@
+{
+  "name": "Weather Forecast Pro",
+  "short_name": "WeatherPro",
+  "description": "Modern production weather app with hourly and 5-day forecast.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d2a3f",
+  "theme_color": "#0d2a3f",
+  "icons": [
+    {
+      "src": "/assets/icons/icon-192.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/icons/icon-512.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ]
+}

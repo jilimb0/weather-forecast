@@ -1,22 +1,23 @@
 # Planning
 
 ## Goal
-Ship a portfolio-ready weather app that deploys cleanly on Netlify without exposing API secrets in client code.
+Ship a production-grade weather app with modern UI, hardened serverless API, and PWA offline support.
 
 ## Architecture Decisions
-- Keep vanilla frontend for simplicity and readability.
-- Use shared weather service logic for both local Express and Netlify Function runtimes.
-- Route frontend requests through `/api/weather` and map to Netlify Function via redirects.
-- Keep OpenWeather API key only in environment variables.
+- Netlify Functions remain runtime for production weather API.
+- OpenWeather `/weather` + `/forecast` are normalized into stable v2 contract.
+- In-memory cache and per-IP rate limiting reduce upstream pressure.
+- Frontend uses global unit state and offline fallback from last payload.
 
 ## Task Breakdown
-1. Create reusable weather service module.
-2. Add Netlify Function endpoint.
-3. Keep local Express server for local development.
-4. Add Netlify config and deployment docs.
-5. Add automated tests for Netlify function behavior.
+1. Harden backend with validation, retries, cache, rate-limits, and error mapping.
+2. Extend payload contract to location/current/hourly/daily/meta.
+3. Rebuild frontend into editorial hero, hourly, daily, metrics, and resilient states.
+4. Add PWA manifest, icons, and service worker caching strategy.
+5. Add frontend tests and update CI quality gates.
+6. Add ADRs and release checklist for maintainability and deployment safety.
 
 ## Risks
-- OpenWeather One Call endpoint availability depends on account tier.
-- Package manager is standardized on pnpm with Biome linting in CI.
-- Browser geolocation permissions can be denied by end users.
+- Serverless in-memory cache/rate limits are best-effort per warm instance.
+- Upstream weather provider limits can still affect availability.
+- PWA behavior may vary across browsers and install contexts.

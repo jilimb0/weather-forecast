@@ -3,118 +3,76 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Simple 3-day weather forecast app using your current location."
-    />
-    <meta name="theme-color" content="#1d2f60" />
+    <meta name="description" content="Production weather forecast app with hourly and daily outlook." />
+    <meta name="theme-color" content="#0d2a3f" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./assets/icons/icon-192.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./assets/icons/icon-192.svg" />
     <link rel="stylesheet" href="./style/style.css" />
     <link rel="stylesheet" href="./style/lightmode.css" id="theme" />
     <script src="./scripts/skycons.js" defer></script>
-    <script src="./scripts/app.js" defer></script>
     <script src="./scripts/switcher.js" defer></script>
-    <title>Weather Forecast</title>
+    <script type="module" src="./scripts/app.mjs"></script>
+    <title>Weather Forecast Pro</title>
   </head>
   <body>
-    <a class="skip-link" href="#weather-main">Skip to forecast</a>
-    <button id="theme-switcher" type="button" aria-label="Toggle theme">Dark</button>
+    <a class="skip-link" href="#app">Skip to content</a>
 
-    <main class="weather-container" id="weather-main" aria-live="polite">
-      <p id="status" class="status" role="status">Loading weather...</p>
+    <header class="topbar">
+      <div>
+        <h1>Plan Your Day With Confidence</h1>
+      </div>
+      <div class="topbar-controls">
+        <button id="unit-switcher" class="btn-utility" type="button" aria-label="Toggle temperature units">°C</button>
+        <button id="theme-switcher" class="btn-utility" type="button" aria-label="Toggle theme">Light</button>
+      </div>
+    </header>
 
-      <section class="weather today" id="weather-today" aria-label="Today weather">
-        <div class="location">
-          <h1 class="location-timezone" data-day="today">Location</h1>
-          <canvas
-            id="icon-today"
-            class="icon"
-            width="100"
-            height="100"
-            aria-label="Today weather icon"
-          ></canvas>
-        </div>
-        <div class="temperature today">
-          <button class="degree-section today" type="button" aria-label="Toggle today temperature unit">
-            <p>Temperature</p>
-            <h2 class="temperature-degree today">--</h2>
-            <span aria-hidden="true">C</span>
-          </button>
-          <button
-            class="degree-feels-like-section today"
-            type="button"
-            aria-label="Toggle today feels-like unit"
-          >
-            <p>Feels like</p>
-            <h2 class="temperature-feels-like today">--</h2>
-            <span aria-hidden="true">C</span>
-          </button>
+    <main id="app" aria-live="polite" aria-busy="true">
+      <section id="status-banner" class="status-banner" role="status">Loading weather data...</section>
+
+      <section class="panel location-panel" aria-label="Location controls">
+        <form id="city-form" class="city-form">
+          <input
+            id="city-input"
+            type="search"
+            placeholder="Search city (e.g. Tbilisi)"
+            aria-label="Search city"
+            aria-controls="city-results"
+            aria-autocomplete="list"
+          />
+          <button type="submit" class="btn-primary">Search</button>
+        </form>
+        <div class="location-actions">
+          <button id="use-location" type="button" class="btn-primary">Use my location</button>
+          <button id="retry-button" type="button" class="btn-primary">Retry</button>
+          <div id="city-results" class="city-results" aria-label="Search results" role="listbox"></div>
         </div>
       </section>
 
-      <section class="weather tomorrow" id="weather-tomorrow" aria-label="Tomorrow weather">
-        <div class="location">
-          <h1 class="location-timezone" data-day="tomorrow">Location</h1>
-          <canvas
-            id="icon-tomorrow"
-            class="icon"
-            width="100"
-            height="100"
-            aria-label="Tomorrow weather icon"
-          ></canvas>
+      <section class="hero panel loading" id="hero-panel" aria-label="Current weather overview">
+        <div>
+          <p class="hero-location" id="hero-location">Loading location...</p>
+          <h2 class="hero-temp" id="hero-temp">--</h2>
+          <p class="hero-condition" id="hero-condition">--</p>
+          <p class="hero-updated" id="hero-updated">--</p>
         </div>
-        <div class="temperature tomorrow">
-          <button class="degree-section tomorrow" type="button" aria-label="Toggle tomorrow temperature unit">
-            <p>Temperature</p>
-            <h2 class="temperature-degree tomorrow">--</h2>
-            <span aria-hidden="true">C</span>
-          </button>
-          <button
-            class="degree-feels-like-section tomorrow"
-            type="button"
-            aria-label="Toggle tomorrow feels-like unit"
-          >
-            <p>Feels like</p>
-            <h2 class="temperature-feels-like tomorrow">--</h2>
-            <span aria-hidden="true">C</span>
-          </button>
-        </div>
+        <canvas id="hero-icon" class="hero-icon" width="280" height="280"></canvas>
       </section>
 
-      <section
-        class="weather day-after-tomorrow"
-        id="weather-day-after-tomorrow"
-        aria-label="Day after tomorrow weather"
-      >
-        <div class="location">
-          <h1 class="location-timezone" data-day="day-after-tomorrow">Location</h1>
-          <canvas
-            id="icon-day-after-tomorrow"
-            class="icon"
-            width="100"
-            height="100"
-            aria-label="Day after tomorrow weather icon"
-          ></canvas>
-        </div>
-        <div class="temperature day-after-tomorrow">
-          <button
-            class="degree-section day-after-tomorrow"
-            type="button"
-            aria-label="Toggle day after tomorrow temperature unit"
-          >
-            <p>Temperature</p>
-            <h2 class="temperature-degree day-after-tomorrow">--</h2>
-            <span aria-hidden="true">C</span>
-          </button>
-          <button
-            class="degree-feels-like-section day-after-tomorrow"
-            type="button"
-            aria-label="Toggle day after tomorrow feels-like unit"
-          >
-            <p>Feels like</p>
-            <h2 class="temperature-feels-like day-after-tomorrow">--</h2>
-            <span aria-hidden="true">C</span>
-          </button>
-        </div>
+      <section class="panel loading" aria-label="Hourly forecast">
+        <h3>Next 24 Hours</h3>
+        <ul id="hourly-list" class="hourly-list"></ul>
+      </section>
+
+      <section class="panel loading" aria-label="Five-day forecast">
+        <h3>5-Day Forecast</h3>
+        <ul id="daily-list" class="daily-list"></ul>
+      </section>
+
+      <section class="panel loading" aria-label="Weather metrics">
+        <h3>Air & Atmosphere</h3>
+        <div class="metrics-grid" id="metrics-grid"></div>
       </section>
     </main>
   </body>

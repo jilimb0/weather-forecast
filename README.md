@@ -1,34 +1,92 @@
-# Weather Forecast
+# Weather Forecast Pro (v2)
 
-A lightweight 3-day weather forecast app with a secure weather proxy and Netlify Function deployment support.
+Production-ready weather application with a modern editorial-glass UI, Netlify Function backend, and PWA offline support.
 
-## Features
+## What this version includes
 
-- Uses browser geolocation to fetch local weather
-- Shows today, tomorrow, and day-after-tomorrow forecast
-- Toggle between Celsius and Fahrenheit per metric
-- Light and dark themes with saved preference
-- Server-side weather proxy (API key stays in environment variables)
-- Netlify Function for production deployment
-- Automated tests + GitHub Actions CI
+- Stable public API contract at `GET /api/weather?lat={number}&lon={number}`
+- V2 normalized weather payload:
+  - `location`
+  - `current`
+  - `hourly` (next 24h in 3h slots, first 8 entries)
+  - `daily` (next 5 days)
+  - `meta`
+- Netlify Function runtime hardening:
+  - coordinate validation (`400`)
+  - upstream rate-limit mapping (`429`)
+  - upstream unavailability mapping (`502`)
+  - internal fallback (`500`)
+  - request-id aware structured logging
+  - short-lived in-memory hot cache
+  - per-IP rate limiting
+  - timeout + retry with jitter
+- Modern production frontend:
+  - hero summary panel
+  - hourly strip
+  - five-day cards
+  - metrics grid
+  - global unit toggle persistence
+  - geolocation fallback location
+  - retry + status banners
+- PWA support:
+  - install manifest
+  - service worker with app-shell cache
+  - network-first API caching
+  - offline fallback to last successful forecast from local storage
+- CI quality gates with pnpm + Biome + Vitest
 
-## Architecture
+## API contract
 
-```mermaid
-flowchart LR
-  Browser["Browser UI (HTML/CSS/JS)"] --> Geo["Geolocation API"]
-  Browser --> API["/api/weather"]
-  API --> NetlifyFn["Netlify Function: weather"]
-  NetlifyFn --> OWM1["OpenWeather /weather"]
-  NetlifyFn --> OWM2["OpenWeather /onecall"]
-  NetlifyFn --> Browser
-  OWM1 --> NetlifyFn
-  OWM2 --> NetlifyFn
+### Request
+
+`GET /api/weather?lat=41.7&lon=44.8`
+
+### Success response
+
+```json
+{
+  "location": {
+    "name": "Tbilisi",
+    "country": "GE",
+    "timezone": 14400,
+    "lat": 41.7,
+    "lon": 44.8
+  },
+  "current": {
+    "dt": 1776156348,
+    "temp": 11,
+    "feelsLike": 9,
+    "humidity": 37,
+    "wind": { "speed": 5, "deg": 200 },
+    "pressure": 1021,
+    "visibility": 10000,
+    "condition": "Clouds",
+    "icon": "03d"
+  },
+  "hourly": [],
+  "daily": [],
+  "meta": {
+    "fetchedAt": "2026-04-14T09:00:00.000Z",
+    "source": "openweather",
+    "units": "metric",
+    "cacheTtlSec": 300,
+    "requestId": "abc123",
+    "cacheHit": false
+  }
+}
 ```
 
-For local development, `/api/weather` is served by Express. In Netlify production, `netlify.toml` redirects `/api/weather` to `/.netlify/functions/weather`.
+### Error response
 
-## Run locally
+```json
+{
+  "error": "message",
+  "code": "ERROR_CODE",
+  "requestId": "abc123"
+}
+```
+
+## Local development
 
 1. Install dependencies:
 
@@ -36,56 +94,55 @@ For local development, `/api/weather` is served by Express. In Netlify productio
 pnpm install
 ```
 
-2. Create `.env` and set your key:
+2. Add env file:
 
 ```bash
 cp .env.example .env
 ```
 
-3. Start the app:
+3. Set `OPENWEATHER_API_KEY` in `.env`.
+
+4. Run app:
 
 ```bash
 pnpm start
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000).
+5. Open `http://localhost:3000`.
 
-## Netlify deployment
+## Netlify production settings
 
-Use these settings in Netlify:
-
-- Branch to deploy: `main`
+- Branch: `main`
 - Base directory: *(empty)*
 - Build command: `pnpm install --frozen-lockfile`
 - Publish directory: `.`
 - Functions directory: `netlify/functions`
+- Required env var: `OPENWEATHER_API_KEY`
 
-Add this environment variable in Netlify project settings:
+`netlify.toml` keeps `/api/weather` as the public route and rewrites to the function.
 
-- `OPENWEATHER_API_KEY`
+## Security and ops notes
 
-`netlify.toml` routes `/api/weather` to the Netlify function automatically.
+- API key is server-only (Netlify env variable).
+- Security headers configured in `netlify.toml`.
+- Release process and rollback documented in `docs/release-checklist.md`.
+
+## Local live reload
+
+When running `pnpm start` on `localhost` or `127.0.0.1`, the app auto-reloads when `index.html`, `scripts/`, `style/`, `src/`, `netlify/`, `manifest.webmanifest`, or `sw.js` change.
 
 ## Scripts
 
-- `pnpm start` - run local Express server
-- `pnpm test` - run tests once
-- `pnpm test:watch` - run tests in watch mode
+- `pnpm start` - local server
+- `pnpm lint` - Biome checks
+- `pnpm format` - Biome fix/write
+- `pnpm test` - unit + integration + frontend tests
+- `pnpm test:e2e` - playwright smoke test
 
-## Security note
+## Architecture decisions
 
-The OpenWeather API key is no longer embedded in frontend code.
+See ADRs:
 
-## Project structure
-
-- `index.html` - UI markup
-- `scripts/app.js` - frontend weather rendering logic
-- `scripts/switcher.js` - theme toggling logic
-- `style/*.css` - base and theme styles
-- `src/weather-service.js` - shared weather validation/fetch logic
-- `src/server.js` - local Express weather proxy endpoint
-- `src/index.js` - local server entrypoint
-- `netlify/functions/weather.js` - production Netlify Function
-- `tests/server.test.mjs` - backend handler tests
-- `tests/netlify-function.test.mjs` - Netlify function tests
-- `.github/workflows/ci.yml` - CI pipeline
+- `docs/adr/0001-netlify-functions.md`
+- `docs/adr/0002-forecast-normalization.md`
+- `docs/adr/0003-caching-rate-limiting.md`
