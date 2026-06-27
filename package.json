@@ -21,7 +21,7 @@
   "type": "commonjs",
   "packageManager": "pnpm@10.29.3",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=26.0.0"
   },
   "bugs": {
     "url": "https://github.com/jilimb0/weather-forecast/issues"
