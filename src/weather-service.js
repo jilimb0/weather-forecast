@@ -1,3 +1,5 @@
+const logger = require("./logger");
+
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const RATE_WINDOW_MS = 60 * 1000;
 const RATE_MAX_REQUESTS = 60;
@@ -302,16 +304,12 @@ async function fetchWeatherPayload({
   const payload = normalizeWeatherPayload(currentData, forecastData, units);
   setCachedPayload(cacheKey, payload);
 
-  console.log(
-    JSON.stringify({
-      level: "info",
-      msg: "weather_payload_served",
-      requestId,
-      cacheHit: false,
-      lat: roundCoord(parsedLat),
-      lon: roundCoord(parsedLon),
-    }),
-  );
+  logger.info("weather_payload_served", {
+    requestId,
+    cacheHit: false,
+    lat: roundCoord(parsedLat),
+    lon: roundCoord(parsedLon),
+  });
 
   return {
     ...payload,

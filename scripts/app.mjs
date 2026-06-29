@@ -1,4 +1,7 @@
-const DEFAULT_LOCATION = { lat: 41.7151, lon: 44.8271, label: "Tbilisi, GE" };
+const DEFAULT_LOCATION =
+  typeof window !== "undefined" && window.__WEATHER_CONFIG__
+    ? window.__WEATHER_CONFIG__.defaultLocation
+    : { lat: 41.7151, lon: 44.8271, label: "Tbilisi, GE" };
 const UNIT_STORAGE_KEY = "weather_units";
 const LAST_PAYLOAD_KEY = "weather_last_payload";
 const SAVED_LOCATION_KEY = "weather_selected_location";

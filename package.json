@@ -5,11 +5,12 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "lint": "biome check .",
+    "lint": "biome check --diagnostic-level=error .",
     "format": "biome check --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "validate": "pnpm lint && pnpm test"
   },
   "repository": {
     "type": "git",
@@ -28,15 +29,15 @@
   },
   "homepage": "https://github.com/jilimb0/weather-forecast#readme",
   "dependencies": {
+    "@sentry/node": "^10.62.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.11",
+    "@biomejs/biome": "^2.5.1",
     "@playwright/test": "^1.59.1",
     "chokidar": "^5.0.0",
     "jsdom": "^29.0.2",
-    "supertest": "^7.2.2",
     "vitest": "^4.1.4"
   }
 }
