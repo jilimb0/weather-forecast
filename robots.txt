@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://weather-forecast.app/sitemap.xml

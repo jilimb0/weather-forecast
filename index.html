@@ -3,7 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Production weather forecast app with hourly and daily outlook." />
+    <title>Weather Forecast Pro — Real-time Weather &amp; Hourly Outlook</title>
+    <meta name="description" content="Production-ready weather forecast app with accurate hourly predictions, 7-day outlook, and offline PWA support." />
+    <meta name="keywords" content="weather forecast, live weather, hourly forecast, weather radar, temperature, offline weather pwa" />
+    <meta name="author" content="Weather Forecast Pro" />
+    <link rel="canonical" href="https://weather-forecast.app/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://weather-forecast.app/" />
+    <meta property="og:title" content="Weather Forecast Pro — Real-time Weather &amp; Hourly Outlook" />
+    <meta property="og:description" content="Production-ready weather forecast app with accurate hourly predictions, 7-day outlook, and offline PWA support." />
+    <meta property="og:image" content="https://weather-forecast.app/assets/og-weather.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://weather-forecast.app/" />
+    <meta name="twitter:title" content="Weather Forecast Pro — Real-time Weather &amp; Hourly Outlook" />
+    <meta name="twitter:description" content="Production-ready weather forecast app with accurate hourly predictions, 7-day outlook, and offline PWA support." />
+    <meta name="twitter:image" content="https://weather-forecast.app/assets/og-weather.png" />
+
+    <!-- Schema.org WebApplication Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Weather Forecast Pro",
+      "url": "https://weather-forecast.app/",
+      "applicationCategory": "WeatherApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "description": "Fast, private, and precise weather forecast with hourly and daily outlook. Works offline as a PWA.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
     <meta name="theme-color" content="#0d2a3f" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./assets/icons/icon-192.svg" type="image/svg+xml" />
@@ -13,7 +53,6 @@
     <script src="./scripts/skycons.js" defer></script>
     <script src="./scripts/switcher.js" defer></script>
     <script type="module" src="./scripts/app.mjs"></script>
-    <title>Weather Forecast Pro</title>
   </head>
   <body>
     <a class="skip-link" href="#app">Skip to content</a>
