@@ -19,19 +19,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "packageManager": "pnpm@10.29.3",
-  "engines": {
-    "node": ">=26.0.0"
-  },
-  "bugs": {
-    "url": "https://github.com/jilimb0/weather-forecast/issues"
-  },
-  "homepage": "https://github.com/jilimb0/weather-forecast#readme",
   "dependencies": {
+    "@hono/node-server": "^1.18.2",
     "@sentry/node": "^10.62.0",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "hono": "^4.9.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
