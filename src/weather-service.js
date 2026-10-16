@@ -1,12 +1,28 @@
 const logger = require("./logger");
+const { ResilientCache } = require("./cache");
+const { CircuitBreaker } = require("./circuit-breaker");
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const RATE_WINDOW_MS = 60 * 1000;
 const RATE_MAX_REQUESTS = 60;
 const FETCH_TIMEOUT_MS = 7000;
-const MAX_RETRIES = 1;
+const MAX_RETRIES = 2;
 
-const weatherCache = new Map();
+const weatherCache = new ResilientCache({
+  defaultTtlMs: CACHE_TTL_MS,
+  maxStaleMs: 24 * 60 * 60 * 1000,
+});
+const geocodeCache = new ResilientCache({
+  defaultTtlMs: 24 * 60 * 60 * 1000,
+  maxStaleMs: 7 * 24 * 60 * 60 * 1000,
+});
+const openWeatherBreaker = new CircuitBreaker({
+  name: "OpenWeather",
+  failureThreshold: 4,
+  recoveryTimeoutMs: 20000,
+  halfOpenMaxAttempts: 1,
+});
+
 const requestBuckets = new Map();
 
 function randomId() {
@@ -48,17 +64,11 @@ function makeCacheKey(lat, lon, units = "metric") {
 }
 
 function getCachedPayload(key) {
-  const cached = weatherCache.get(key);
-  if (!cached) return null;
-  if (Date.now() - cached.storedAt > CACHE_TTL_MS) {
-    weatherCache.delete(key);
-    return null;
-  }
-  return cached.value;
+  return weatherCache.getFresh(key);
 }
 
 function setCachedPayload(key, payload) {
-  weatherCache.set(key, { value: payload, storedAt: Date.now() });
+  weatherCache.set(key, payload);
 }
 
 function enforceRateLimit(ipAddress = "unknown") {
@@ -91,15 +101,18 @@ async function fetchWithTimeout(url, fetchImpl, timeoutMs = FETCH_TIMEOUT_MS) {
   }
 }
 
-async function fetchWithRetry(url, fetchImpl) {
+async function fetchWithRetry(url, fetchImpl, maxRetries = MAX_RETRIES) {
   let lastError;
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
     try {
       return await fetchWithTimeout(url, fetchImpl);
     } catch (error) {
       lastError = error;
-      if (attempt === MAX_RETRIES) break;
-      const jitterMs = 120 + Math.floor(Math.random() * 180);
+      if (attempt === maxRetries) break;
+      const baseDelayMs = 150;
+      const maxDelayMs = 2000;
+      const expDelay = Math.min(maxDelayMs, baseDelayMs * 2 ** attempt);
+      const jitterMs = Math.floor(Math.random() * expDelay);
       await new Promise((resolve) => setTimeout(resolve, jitterMs));
     }
   }
@@ -284,29 +297,59 @@ async function fetchWeatherPayload({
   const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${parsedLat}&lon=${parsedLon}&units=${units}&appid=${apiKey}`;
   const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${parsedLat}&lon=${parsedLon}&units=${units}&appid=${apiKey}`;
 
-  const [currentResponse, forecastResponse] = await Promise.all([
-    fetchWithRetry(currentUrl, fetchImpl),
-    fetchWithRetry(forecastUrl, fetchImpl),
-  ]);
+  const payload = await openWeatherBreaker.execute(
+    async () => {
+      const [currentResponse, forecastResponse] = await Promise.all([
+        fetchWithRetry(currentUrl, fetchImpl),
+        fetchWithRetry(forecastUrl, fetchImpl),
+      ]);
 
-  if (!currentResponse.ok) {
-    throw mapUpstreamStatus(currentResponse.status, await parseErrorBody(currentResponse));
-  }
-  if (!forecastResponse.ok) {
-    throw mapUpstreamStatus(forecastResponse.status, await parseErrorBody(forecastResponse));
-  }
+      if (!currentResponse.ok) {
+        throw mapUpstreamStatus(currentResponse.status, await parseErrorBody(currentResponse));
+      }
+      if (!forecastResponse.ok) {
+        throw mapUpstreamStatus(forecastResponse.status, await parseErrorBody(forecastResponse));
+      }
 
-  const [currentData, forecastData] = await Promise.all([
-    currentResponse.json(),
-    forecastResponse.json(),
-  ]);
+      const [currentData, forecastData] = await Promise.all([
+        currentResponse.json(),
+        forecastResponse.json(),
+      ]);
 
-  const payload = normalizeWeatherPayload(currentData, forecastData, units);
-  setCachedPayload(cacheKey, payload);
+      const normalized = normalizeWeatherPayload(currentData, forecastData, units);
+      setCachedPayload(cacheKey, normalized);
+      return normalized;
+    },
+    (err) => {
+      const stale = weatherCache.getStale(cacheKey);
+      if (stale) {
+        logger.warn("serving_stale_weather_fallback", {
+          requestId,
+          lat: roundCoord(parsedLat),
+          lon: roundCoord(parsedLon),
+          reason: err?.message,
+        });
+        return {
+          ...stale,
+          meta: {
+            ...stale.meta,
+            requestId,
+            cacheHit: true,
+            stale: true,
+          },
+        };
+      }
+      return null;
+    },
+  );
+
+  // If payload was served fresh from breaker action or as fresh cache
+  const isStale = Boolean(payload?.meta?.stale);
 
   logger.info("weather_payload_served", {
     requestId,
     cacheHit: false,
+    stale: isStale,
     lat: roundCoord(parsedLat),
     lon: roundCoord(parsedLon),
   });
@@ -316,7 +359,8 @@ async function fetchWeatherPayload({
     meta: {
       ...payload.meta,
       requestId,
-      cacheHit: false,
+      cacheHit: isStale,
+      stale: isStale,
     },
   };
 }
@@ -336,22 +380,39 @@ async function geocodeCity({ apiKey, query, fetchImpl = fetch }) {
     throw err;
   }
 
-  const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query.trim())}&limit=5&appid=${apiKey}`;
-  const response = await fetchWithRetry(url, fetchImpl);
-
-  if (!response.ok) {
-    throw mapUpstreamStatus(response.status, await parseErrorBody(response));
+  const queryKey = query.trim().toLowerCase();
+  const cached = geocodeCache.getFresh(queryKey);
+  if (cached) {
+    return cached;
   }
 
-  const rows = await response.json();
-  return rows.map((item) => ({
-    name: item.name,
-    country: item.country,
-    state: item.state || "",
-    lat: item.lat,
-    lon: item.lon,
-    label: `${item.name}${item.state ? `, ${item.state}` : ""}, ${item.country}`,
-  }));
+  const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query.trim())}&limit=5&appid=${apiKey}`;
+  const results = await openWeatherBreaker.execute(
+    async () => {
+      const response = await fetchWithRetry(url, fetchImpl);
+      if (!response.ok) {
+        throw mapUpstreamStatus(response.status, await parseErrorBody(response));
+      }
+      const rows = await response.json();
+      const mapped = rows.map((item) => ({
+        name: item.name,
+        country: item.country,
+        state: item.state || "",
+        lat: item.lat,
+        lon: item.lon,
+        label: `${item.name}${item.state ? `, ${item.state}` : ""}, ${item.country}`,
+      }));
+      geocodeCache.set(queryKey, mapped);
+      return mapped;
+    },
+    () => {
+      const stale = geocodeCache.getStale(queryKey);
+      if (stale) return stale;
+      return null;
+    },
+  );
+
+  return results;
 }
 
 function mapApiError(error, requestId) {
@@ -378,6 +439,9 @@ function mapApiError(error, requestId) {
 
 module.exports = {
   CACHE_TTL_MS,
+  openWeatherBreaker,
+  weatherCache,
+  geocodeCache,
   parseCoordinate,
   normalizeWeatherPayload,
   fetchWeatherPayload,

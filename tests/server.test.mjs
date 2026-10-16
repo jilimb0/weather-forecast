@@ -165,17 +165,11 @@ describe("createApp security headers", () => {
   it("applies defensive security headers to requests", async () => {
     const { createApp } = require("../src/server");
     const app = createApp({ apiKey: "test-key" });
-    const server = app.listen(0);
-    const port = server.address().port;
-    try {
-      const response = await fetch(`http://127.0.0.1:${port}/health`);
-      expect(response.headers.get("x-content-type-options")).toBe("nosniff");
-      expect(response.headers.get("x-frame-options")).toBe("DENY");
-      expect(response.headers.get("referrer-policy")).toBe("strict-origin-when-cross-origin");
-      expect(response.headers.get("permissions-policy")).toBe("geolocation=(self)");
-      expect(response.headers.get("content-security-policy")).toContain("default-src 'self'");
-    } finally {
-      await new Promise((resolve) => server.close(resolve));
-    }
+    const response = await app.request("/health");
+    expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(response.headers.get("x-frame-options")).toBe("DENY");
+    expect(response.headers.get("referrer-policy")).toBe("strict-origin-when-cross-origin");
+    expect(response.headers.get("permissions-policy")).toBe("geolocation=(self)");
+    expect(response.headers.get("content-security-policy")).toContain("default-src 'self'");
   });
 });
