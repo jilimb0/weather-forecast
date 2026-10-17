@@ -2,6 +2,11 @@
 
 Production-ready weather application with a modern editorial-glass UI, Netlify Function backend, and PWA offline support.
 
+## Monetization & Billing
+
+- **Stripe & Telegram Stars Paywall**: Tiered subscription for high-resolution Doppler radar, hyper-local storm alerts, and minute-by-minute precipitation forecasting.
+- **CryptoBot & Merchant of Record**: Automated paywall and webhook billing infrastructure for commercial API usage and historical data export.
+
 ## What this version includes
 
 - Stable public API contract at `GET /api/weather?lat={number}&lon={number}`

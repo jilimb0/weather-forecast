@@ -41,7 +41,7 @@ self.addEventListener("fetch", (event) => {
 
   if (url.pathname.startsWith("/api/weather") || url.pathname.startsWith("/.netlify/functions/weather")) {
     event.respondWith(
-      fetch(request)
+      fetch(request, { signal: AbortSignal.timeout(10_000) })
         .then((networkRes) => {
           const copy = networkRes.clone();
           caches.open(API_CACHE).then((cache) => cache.put(request, copy));
