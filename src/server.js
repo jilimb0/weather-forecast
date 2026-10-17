@@ -93,9 +93,12 @@ function createApp({ apiKey, fetchImpl = fetch, liveReloadMiddleware = null } = 
     Sentry.init({ dsn: process.env.SENTRY_DSN, tracesSampleRate: 0.2 });
   }
 
-  // Defensive security headers middleware
+  // Defensive security headers & correlation ID middleware
   app.use("*", async (c, next) => {
+    const correlationId =
+      c.req.header("x-correlation-id") || c.req.header("x-request-id") || randomId();
     await next();
+    c.header("X-Correlation-ID", correlationId);
     c.header("X-Content-Type-Options", "nosniff");
     c.header("X-Frame-Options", "DENY");
     c.header("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -115,9 +118,10 @@ function createApp({ apiKey, fetchImpl = fetch, liveReloadMiddleware = null } = 
     });
   }
 
-  app.get("/health", (c) => {
+  const healthHandler = (c) => {
     return c.json(
       {
+        status: "ok",
         ok: true,
         timestamp: new Date().toISOString(),
         checks: {
@@ -126,7 +130,10 @@ function createApp({ apiKey, fetchImpl = fetch, liveReloadMiddleware = null } = 
       },
       200,
     );
-  });
+  };
+
+  app.get("/health", healthHandler);
+  app.get("/healthz", healthHandler);
 
   const weatherHandler = createWeatherHandler({ apiKey, fetchImpl });
   const geocodeHandler = createGeocodeHandler({ apiKey, fetchImpl });

@@ -161,7 +161,7 @@ describe("geocode handler", () => {
   });
 });
 
-describe("createApp security headers", () => {
+describe("createApp security headers and observability", () => {
   it("applies defensive security headers to requests", async () => {
     const { createApp } = require("../src/server");
     const app = createApp({ apiKey: "test-key" });
@@ -171,5 +171,19 @@ describe("createApp security headers", () => {
     expect(response.headers.get("referrer-policy")).toBe("strict-origin-when-cross-origin");
     expect(response.headers.get("permissions-policy")).toBe("geolocation=(self)");
     expect(response.headers.get("content-security-policy")).toContain("default-src 'self'");
+    expect(response.headers.get("x-correlation-id")).toBeDefined();
+  });
+
+  it("exposes /healthz and preserves inbound x-correlation-id", async () => {
+    const { createApp } = require("../src/server");
+    const app = createApp({ apiKey: "test-key" });
+    const response = await app.request("/healthz", {
+      headers: { "x-correlation-id": "cid-custom-123" },
+    });
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.status).toBe("ok");
+    expect(body.ok).toBe(true);
+    expect(response.headers.get("x-correlation-id")).toBe("cid-custom-123");
   });
 });
