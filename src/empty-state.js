@@ -4,8 +4,9 @@
  */
 
 export function renderEmptyState(options = {}) {
-  const title = options.title || 'Погода не загружена';
-  const description = options.description || 'Укажите город или разрешите геолокацию для получения прогноза.';
+  const title = options.title || "Погода не загружена";
+  const description =
+    options.description || "Укажите город или разрешите геолокацию для получения прогноза.";
   return `
     <div class="empty-state zero-state flex flex-col items-center justify-center p-8 text-center bg-white/10 backdrop-blur rounded-2xl border border-white/20">
       <div class="text-4xl mb-3">🌤️</div>
@@ -33,8 +34,11 @@ export function withErrorBoundary(fn) {
     try {
       return fn(...args);
     } catch (err) {
-      console.warn('[ErrorBoundary-Captured]', err);
-      return renderEmptyState({ title: 'Сбой отображения прогноза', description: String(err.message || err) });
+      console.warn("[ErrorBoundary-Captured]", err);
+      return renderEmptyState({
+        title: "Сбой отображения прогноза",
+        description: String(err.message || err),
+      });
     }
   };
 }
@@ -50,5 +54,5 @@ export async function deleteAccount(userId) {
 
 export async function exportData(userId) {
   // GDPR data export
-  return JSON.stringify({ userId, savedLocations: [], preferences: { units: 'metric' } });
+  return JSON.stringify({ userId, savedLocations: [], preferences: { units: "metric" } });
 }
