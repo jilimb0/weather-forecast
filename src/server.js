@@ -90,7 +90,22 @@ function createApp({ apiKey, fetchImpl = fetch, liveReloadMiddleware = null } = 
   const app = new Hono();
 
   if (process.env.SENTRY_DSN) {
-    Sentry.init({ dsn: process.env.SENTRY_DSN, tracesSampleRate: 0.2 });
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      tracesSampleRate: 0.2,
+      sendDefaultPii: false,
+      beforeSend(event) {
+        if (event.request?.headers) {
+          delete event.request.headers["authorization"];
+          delete event.request.headers["cookie"];
+          delete event.request.headers["x-forwarded-for"];
+        }
+        if (event.request?.query_string) {
+          delete event.request.query_string;
+        }
+        return event;
+      },
+    });
   }
 
   // Defensive security headers & correlation ID middleware

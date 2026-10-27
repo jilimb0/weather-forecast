@@ -56,7 +56,7 @@ function parseCoordinate(value, label) {
 }
 
 function roundCoord(value) {
-  return Math.round(value * 10) / 10;
+  return Math.round(value * 100) / 100;
 }
 
 function makeCacheKey(lat, lon, units = "metric") {
@@ -278,8 +278,8 @@ async function fetchWeatherPayload({
     throw err;
   }
 
-  const parsedLat = parseCoordinate(lat, "lat");
-  const parsedLon = parseCoordinate(lon, "lon");
+  const parsedLat = roundCoord(parseCoordinate(lat, "lat"));
+  const parsedLon = roundCoord(parseCoordinate(lon, "lon"));
   const cacheKey = makeCacheKey(parsedLat, parsedLon, units);
 
   const cachedPayload = getCachedPayload(cacheKey);
