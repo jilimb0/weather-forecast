@@ -1,40 +1,37 @@
 # ADR-0000: Title of Architectural Decision
 
-**Status:** Proposed | Accepted | Deprecated | Superseded  
+**Status:** Proposed | Accepted | Deprecated | Superseded by ADR-XXXX  
 **Date:** YYYY-MM-DD  
 **Deciders:** Core Engineering Team  
+**Applies-To:** `src/**`, `packages/core/**`  
+**Supersedes:** None  
+**Overrides-Global:** None (or `GLOBAL-XXX` from `golden-standards.md`)  
+
+## Y-Summary
+In the context of `<module/domain>`, facing `<problem/constraint>`, we decided for `<chosen option>` and neglected `<rejected options>`, to achieve `<system quality/benefit>`, accepting `<trade-off/cost>`.
 
 ## Context and Problem Statement
-Clear statement of technical context, architectural driver, or trade-off.
+Concise description of the architectural problem, domain invariant, or technical force requiring a durable decision.
 
 ## Decision Drivers
-- Functional requirement or domain invariant
-- Security, privacy or resilience constraint
-- Operational simplicity and maintainability
+- Functional requirement or domain invariant (e.g., Idempotency, Resilience, Numeric Precision, Privacy, Offline Sync, A11y/SSR)
+- Operational simplicity, latency/memory budget, and maintainability
 
-## Considered Options
-- Option 1: Architecture approach A
-- Option 2: Architecture approach B
+## Imperative Constraints for AI Agents (MUST / MUST NOT)
+- **MUST:** Explicit rule that every change in `Applies-To` paths must obey.
+- **MUST NOT:** Prohibited pattern, dependency, or cross-layer import.
+- **DO NOT RE-INTRODUCE:** Specific legacy or rejected workaround that agents must not refactor back in.
 
-## Decision Outcome
-Chosen option: "Option 1", because it satisfies all drivers with minimal complexity.
+## Considered Options & Rejected Alternatives
+1. **Option 1 (Chosen): `<Name of chosen approach>`**
+   - *Why chosen:* Satisfies all decision drivers with minimal complexity and strong contract safety.
+2. **Option 2 (Rejected — DO NOT PROPOSE): `<Name of rejected approach>`**
+   - *Why rejected:* Concrete technical failure mode, latency/memory penalty, security risk, or maintenance hazard.
 
-### Positive Consequences
-- Verified contract safety and zero regressions
-- Predictable performance and isolation
+## Consequences & Trade-offs
+- **Positive:** Predictable behavior, verified invariants, zero regression risk.
+- **Negative / Cost:** Localized boilerplate or migration step required.
 
-### Negative Consequences / Trade-offs
-- Requires migration step or localized abstraction
-
-## Pros and Cons of Options
-### Option 1
-- Good: Idiomatic, type-safe, minimal surface
-- Bad: Initial setup overhead
-
-### Option 2
-- Good: Familiar legacy pattern
-- Bad: Tight coupling and schema drift risk
-
-## Links and Evidence
-- Pull Request / Task ID reference
-- Metrics and benchmark results
+## Verification Gate
+- **Check Command:** `pnpm test` / `pnpm lint` / `pnpm typecheck` (exact command verifying compliance)
+- **Code Anchors:** Key files containing `// See .ai/adr/NNNN-...` comments.
