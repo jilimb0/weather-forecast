@@ -1,13 +1,13 @@
 # ADR 0002: Normalize from /weather + /forecast (not /onecall)
 
 ## Status
-Accepted
+Accepted (Agent-Optimized specification indexed at `.ai/adr/0002-forecast-normalization-pipeline.md`)
 
 ## Decision
 Build v2 payload by combining OpenWeather `/weather` and `/forecast` endpoints.
 
 ## Rationale
-- `/onecall` availability varies by plan and caused production failures.
+- `/onecall` availability varies by plan and caused production failures on standard keys.
 - `/forecast` is broadly available and sufficient for hourly + 5-day views.
 - Normalization creates a stable frontend contract independent of upstream differences.
 

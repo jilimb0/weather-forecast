@@ -1,12 +1,12 @@
 # Weather Forecast
 
-Production-ready weather forecast app with Express backend, Netlify Functions, PWA support,
+Production-ready weather forecast app with Hono backend, Netlify Functions, PWA support,
 structured logging, and Sentry monitoring.
 
 ## Tech Stack
 - **Language:** JavaScript (CommonJS + ESM)
-- **Backend:** Express 5 + Netlify Functions
-- **Tests:** Vitest (18 tests), Playwright (E2E)
+- **Backend:** Hono + Netlify Functions
+- **Tests:** Vitest (27 tests across 7 files), Playwright (4 E2E tests)
 - **Lint/Format:** Biome 2.5
 - **Monitoring:** Sentry + structured logger
 - **PWA:** Service Worker + Web Manifest
@@ -20,14 +20,14 @@ structured logging, and Sentry monitoring.
 - `pnpm validate` — lint + test
 
 ## Structure
-- `src/` — server, weather service, logger
-- `netlify/functions/` — serverless API
+- `src/` — server, weather service, cache, circuit breaker, logger
+- `netlify/functions/` — serverless API (weather, geocode)
 - `scripts/` — frontend app modules
-- `tests/` — Vitest (5 files, 18 tests)
+- `tests/` — Vitest (7 files, 27 tests)
 - `e2e/` — Playwright (4 tests)
 
 ## Conventions
-- CommonJS for Node, ESM for frontend
-- Minimal dependencies (Express + dotenv + Sentry)
+- CommonJS for Node backend, ESM for frontend and tests
+- Minimal dependencies (Hono + dotenv + Sentry)
 - Structured logger with ISO timestamps
 - Docker Compose for local dev

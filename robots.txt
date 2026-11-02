@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://weather-forecast.app/sitemap.xml
+Sitemap: https://weather-forecast-jilimb0.netlify.app/sitemap.xml

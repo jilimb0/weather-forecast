@@ -1,10 +1,10 @@
 # ADR 0001: Use Netlify Functions for Weather API
 
 ## Status
-Accepted
+Accepted (See `.ai/adr/0003-hono-and-netlify-functions-runtime.md` for current unified runtime architecture)
 
 ## Decision
-Use Netlify Functions as the production backend runtime for weather proxy and normalization logic.
+Use Netlify Functions as the production backend runtime for weather proxy and normalization logic, alongside Hono for local and container development.
 
 ## Rationale
 - Aligns with existing deployment target.

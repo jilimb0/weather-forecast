@@ -16,15 +16,17 @@ Production-ready weather application with a modern editorial-glass UI, Netlify F
   - `hourly` (next 24h in 3h slots, first 8 entries)
   - `daily` (next 5 days)
   - `meta`
-- Netlify Function runtime hardening:
+- Netlify Function and Hono runtime hardening:
   - coordinate validation (`400`)
   - upstream rate-limit mapping (`429`)
   - upstream unavailability mapping (`502`)
   - internal fallback (`500`)
-  - request-id aware structured logging
-  - short-lived in-memory hot cache
+  - request-id aware structured logging and correlation ID tracing
+  - two-tier Stale-While-Revalidate resilient cache (5m fresh / 24h stale)
+  - stateful OpenWeather Circuit Breaker with Half-Open probe recovery
+  - 24-hour geocoding cache
   - per-IP rate limiting
-  - timeout + retry with jitter
+  - timeout + retry with Full Jitter exponential backoff
 - Modern production frontend:
   - hero summary panel
   - hourly strip
@@ -138,16 +140,19 @@ When running `pnpm start` on `localhost` or `127.0.0.1`, the app auto-reloads wh
 
 ## Scripts
 
-- `pnpm start` - local server
+- `pnpm start` - local Hono server with live reload
 - `pnpm lint` - Biome checks
 - `pnpm format` - Biome fix/write
-- `pnpm test` - unit + integration + frontend tests
-- `pnpm test:e2e` - playwright smoke test
+- `pnpm test` - Vitest unit + integration tests (27 tests across 7 suites)
+- `pnpm test:e2e` - Playwright smoke tests
+- `pnpm validate` - Full verification gate (`pnpm lint && pnpm test`)
 
 ## Architecture decisions
 
-See ADRs:
+Architectural decisions follow the Agent-Optimized ADR protocol and are indexed in `.ai/ARCHITECTURE.md`:
 
-- `docs/adr/0001-netlify-functions.md`
-- `docs/adr/0002-forecast-normalization.md`
-- `docs/adr/0003-caching-rate-limiting.md`
+- [ADR-0001: Zero-Dependency Vanilla JS Runtime, OpenWeather Circuit Breaker & Stale-While-Revalidate Cache](.ai/adr/0001-openweather-circuit-breaker-and-stale-while-revalidate.md)
+- [ADR-0002: Forecast Normalization Pipeline (/weather + /forecast)](.ai/adr/0002-forecast-normalization-pipeline.md)
+- [ADR-0003: Unified Hono and Netlify Functions Runtime Architecture](.ai/adr/0003-hono-and-netlify-functions-runtime.md)
+
+Historical ADR records are cross-referenced in `docs/adr/`.

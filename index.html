@@ -3,44 +3,98 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Weather Forecast Pro — Real-time Weather &amp; Hourly Outlook</title>
-    <meta name="description" content="Production-ready weather forecast app with accurate hourly predictions, 7-day outlook, and offline PWA support." />
-    <meta name="keywords" content="weather forecast, live weather, hourly forecast, weather radar, temperature, offline weather pwa" />
+    <title>Weather Forecast Pro (weather-forecast-jilimb0.netlify.app) — Real-time Weather &amp; Hourly Outlook</title>
+    <meta name="description" content="Weather Forecast Pro (weather-forecast-jilimb0.netlify.app) is a production-ready weather forecast PWA with accurate hourly predictions, 5-day outlook, and offline support." />
+    <meta name="keywords" content="weather forecast, live weather, hourly forecast, weather radar, temperature, offline weather pwa, weather forecast pro" />
     <meta name="author" content="Weather Forecast Pro" />
-    <link rel="canonical" href="https://weather-forecast.app/" />
+    <link rel="canonical" href="https://weather-forecast-jilimb0.netlify.app/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://weather-forecast.app/" />
-    <meta property="og:title" content="Weather Forecast Pro — Real-time Weather &amp; Hourly Outlook" />
-    <meta property="og:description" content="Production-ready weather forecast app with accurate hourly predictions, 7-day outlook, and offline PWA support." />
-    <meta property="og:image" content="https://weather-forecast.app/assets/og-weather.png" />
+    <meta property="og:url" content="https://weather-forecast-jilimb0.netlify.app/" />
+    <meta property="og:title" content="Weather Forecast Pro (weather-forecast-jilimb0.netlify.app) — Real-time Weather &amp; Hourly Outlook" />
+    <meta property="og:description" content="Weather Forecast Pro (weather-forecast-jilimb0.netlify.app) provides accurate hourly predictions, 5-day forecast, and offline PWA capability." />
+    <meta property="og:image" content="https://weather-forecast-jilimb0.netlify.app/assets/og-weather.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://weather-forecast.app/" />
-    <meta name="twitter:title" content="Weather Forecast Pro — Real-time Weather &amp; Hourly Outlook" />
-    <meta name="twitter:description" content="Production-ready weather forecast app with accurate hourly predictions, 7-day outlook, and offline PWA support." />
-    <meta name="twitter:image" content="https://weather-forecast.app/assets/og-weather.png" />
+    <meta name="twitter:url" content="https://weather-forecast-jilimb0.netlify.app/" />
+    <meta name="twitter:title" content="Weather Forecast Pro (weather-forecast-jilimb0.netlify.app)" />
+    <meta name="twitter:description" content="Production-ready weather forecast app with accurate hourly predictions and offline PWA support." />
+    <meta name="twitter:image" content="https://weather-forecast-jilimb0.netlify.app/assets/og-weather.png" />
 
-    <!-- Schema.org WebApplication Structured Data -->
+    <!-- Structured Data (JSON-LD @graph) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Weather Forecast Pro",
-      "url": "https://weather-forecast.app/",
-      "applicationCategory": "WeatherApplication",
-      "operatingSystem": "All",
-      "browserRequirements": "Requires JavaScript. Requires HTML5.",
-      "description": "Fast, private, and precise weather forecast with hourly and daily outlook. Works offline as a PWA.",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://weather-forecast-jilimb0.netlify.app/#organization",
+          "name": "Weather Forecast Pro",
+          "url": "https://weather-forecast-jilimb0.netlify.app",
+          "sameAs": [
+            "https://github.com/jilimb0/weather-forecast"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://weather-forecast-jilimb0.netlify.app/#website",
+          "name": "Weather Forecast Pro",
+          "alternateName": ["Weather Forecast Pro (weather-forecast-jilimb0.netlify.app)", "Weather Forecast"],
+          "url": "https://weather-forecast-jilimb0.netlify.app/",
+          "description": "Weather Forecast Pro (weather-forecast-jilimb0.netlify.app) is an accurate real-time weather and hourly forecast application.",
+          "publisher": {
+            "@id": "https://weather-forecast-jilimb0.netlify.app/#organization"
+          }
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://weather-forecast-jilimb0.netlify.app/#application",
+          "name": "Weather Forecast Pro",
+          "url": "https://weather-forecast-jilimb0.netlify.app",
+          "applicationCategory": "WeatherApplication",
+          "applicationSubCategory": "Real-time Weather Forecast & Hourly Outlook",
+          "operatingSystem": "All",
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "description": "Fast, private, and precise weather forecast with hourly and daily outlook. Works offline as a PWA.",
+          "sameAs": [
+            "https://github.com/jilimb0/weather-forecast"
+          ],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "author": {
+            "@id": "https://weather-forecast-jilimb0.netlify.app/#organization"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://weather-forecast-jilimb0.netlify.app/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is Weather Forecast Pro (weather-forecast-jilimb0.netlify.app)?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Weather Forecast Pro (weather-forecast-jilimb0.netlify.app) is a production-ready weather forecast application with accurate hourly predictions, 5-day outlook, atmospheric metrics, and offline PWA support."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does Weather Forecast Pro work offline?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, as a Progressive Web App (PWA) it caches recent weather forecasts and interface assets for offline availability."
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
 
@@ -55,6 +109,24 @@
     <script type="module" src="./scripts/app.mjs"></script>
   </head>
   <body>
+    <noscript>
+      <section style="max-width: 720px; margin: 2rem auto; padding: 1.5rem; font-family: sans-serif; line-height: 1.6;">
+        <h1>Weather Forecast Pro (weather-forecast-jilimb0.netlify.app)</h1>
+        <p>
+          <strong>Weather Forecast Pro (weather-forecast-jilimb0.netlify.app)</strong> is a production-ready weather forecast application with accurate hourly predictions, 5-day outlook, atmospheric metrics, and offline PWA support powered by a Netlify Function API backend.
+        </p>
+        <ul>
+          <li><strong>Real-time Weather:</strong> Temperature, condition, humidity, wind, and pressure metrics.</li>
+          <li><strong>Hourly &amp; 5-Day Outlook:</strong> Detailed forecasts in 3-hour slots and daily summaries.</li>
+          <li><strong>Offline PWA:</strong> Progressive Web App caching for instant access without network.</li>
+        </ul>
+      </section>
+      <nav style="text-align: center; padding: 1rem; font-family: sans-serif;">
+        <a href="/">Home</a> ·
+        <a href="https://weather-forecast-jilimb0.netlify.app">Live App</a> ·
+        <a href="https://github.com/jilimb0/weather-forecast">GitHub Repository</a>
+      </nav>
+    </noscript>
     <a class="skip-link" href="#app">Skip to content</a>
 
     <header class="topbar">

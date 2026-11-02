@@ -1,0 +1,17 @@
+# llms.txt
+
+Weather Forecast Pro (weather-forecast-jilimb0.netlify.app) — Real-time Weather & Hourly Outlook
+
+Weather Forecast Pro (weather-forecast-jilimb0.netlify.app) is a production-ready weather forecast application with accurate hourly predictions, 5-day outlook, atmospheric metrics, and offline PWA support powered by a Netlify Function API backend.
+
+## Core Capabilities
+
+- **Normalized Weather API**: Stable public API at `GET /api/weather?lat={number}&lon={number}`.
+- **Hourly Strip**: Next 24 hours in 3-hour slots.
+- **5-Day Outlook**: Aggregated daily weather conditions, temperature range, and wind trends.
+- **Offline PWA**: Service Worker caching of assets and latest forecasts.
+
+## Links
+
+- [Live Deployment](https://weather-forecast-jilimb0.netlify.app)
+- [GitHub Repository](https://github.com/jilimb0/weather-forecast)

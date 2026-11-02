@@ -2,11 +2,12 @@
 
 ## Architecture
 
-- **Backend:** Express 5 (dev) / Netlify Functions (production)
-- **Frontend:** Vanilla JS SPA with ARIA a11y
-- **API Source:** OpenWeather (weather + forecast endpoints)
+- **Backend:** Hono (dev/container) / Netlify Functions (production)
+- **Frontend:** Vanilla JS SPA with ARIA a11y & Service Worker PWA
+- **API Source:** OpenWeather (weather + forecast endpoints normalized)
+- **Fault Tolerance:** Circuit Breaker (`src/circuit-breaker.js`) + 2-tier Stale-While-Revalidate cache (`src/cache.js`)
 - **PWA:** Service Worker + Web Manifest
-- **Testing:** Vitest (unit/integration), Playwright (E2E)
+- **Testing:** Vitest (unit/integration, 27 tests), Playwright (E2E)
 - **CI:** GitHub Actions (lint + test + Lighthouse CI)
 - **Deploy:** Netlify (Git-based)
 
@@ -41,9 +42,10 @@ Set `OPENWEATHER_API_KEY` and `SENTRY_DSN` in Netlify dashboard environment vari
 
 ## Monitoring
 
-- Health endpoint: `GET /health` — returns `{ ok, timestamp, checks }`
-- Sentry error tracking (when `SENTRY_DSN` is configured)
-- Structured logging via logger (ISO timestamps, level prefixes)
+- Health endpoints: `GET /health`, `GET /healthz` — returns `{ ok, timestamp, checks }`
+- Sentry error tracking with header sanitization (when `SENTRY_DSN` is configured)
+- Structured logging via logger (ISO timestamps, level prefixes, `requestId`)
+- Correlation ID tracking: `X-Correlation-ID` header injected on responses
 
 ## Troubleshooting
 
@@ -52,12 +54,14 @@ Set `OPENWEATHER_API_KEY` and `SENTRY_DSN` in Netlify dashboard environment vari
 2. Verify the key works: `curl http://localhost:3000/health`
 3. Check logs for errors
 
-### Weather API returns 500
+### Weather API returns 500/502
 1. Verify your OpenWeather API key is valid and not rate-limited
-2. Check the server logs for error details
-3. If using Netlify, check function logs in Netlify dashboard
+2. Check if circuit breaker is `OPEN` (resets to `HALF_OPEN` after 20 seconds)
+3. Check server logs for error details (`UPSTREAM_UNAVAILABLE`, `RATE_LIMITED`)
+4. If using Netlify, check function logs in Netlify dashboard
 
-### Rate limiting
+### Rate limiting & Cache
 - Local server: 60 requests/minute per IP (in-memory)
-- Netlify: rate limit state is lost on cold starts
-- Clear your in-memory cache by restarting the server
+- Resilient Cache: 5 min fresh TTL, 24-hour stale fallback
+- Geocoding Cache: 24-hour TTL with 7-day stale fallback
+- Clear in-memory cache by restarting the server

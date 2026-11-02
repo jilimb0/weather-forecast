@@ -7,8 +7,8 @@ weather-forecast — Resilient offline-first weather forecasting progressive web
 - **Default Branch:** `main`
 
 ## 2. Stack & Runtime
-- **Runtime:** Vanilla TypeScript, Hono, Biome, Playwright, Vitest, Service Workers.
-- **Directories:** `src`, `scripts`, `tests`, `assets`
+- **Runtime:** Vanilla JavaScript (CommonJS for Node backend, native ESM for frontend & tests), Hono, Netlify Functions, Biome, Playwright, Vitest, Service Workers.
+- **Directories:** `src`, `netlify/functions`, `scripts`, `style`, `tests`, `e2e`, `assets`
 
 ## 3. Structural Invariants
 - Never fail UI render when external weather APIs are offline (fallback to cached forecasts).
@@ -22,3 +22,5 @@ weather-forecast — Resilient offline-first weather forecasting progressive web
 
 ## 5. Active ADRs
 - **[ADR-0001](.ai/adr/0001-openweather-circuit-breaker-and-stale-while-revalidate.md)** (`src/**`, `tests/**`, overrides `GLOBAL-TS-01`): Zero-dependency ES modules (`src/*.js`), OpenWeather Circuit Breaker (`src/circuit-breaker.js`), 5m/24h Stale-While-Revalidate cache (`src/cache.js`), and 24h geocoding cache.
+- **[ADR-0002](.ai/adr/0002-forecast-normalization-pipeline.md)** (`src/weather-service.js`, `netlify/functions/**`, `tests/**`): Normalized v2 weather payload from standard OpenWeather `/weather` + `/forecast` endpoints, rejecting `/onecall`.
+- **[ADR-0003](.ai/adr/0003-hono-and-netlify-functions-runtime.md)** (`src/server.js`, `src/index.js`, `netlify/functions/**`, `tests/**`): Hono standalone/container server and serverless Netlify Functions with shared core handlers and uniform defensive security headers.
