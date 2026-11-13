@@ -4,26 +4,31 @@ const { Hono } = require("hono");
 const { serveStatic } = require("@hono/node-server/serve-static");
 const { serve } = require("@hono/node-server");
 const Sentry = require("@sentry/node");
-const { fetchWeatherPayload, geocodeCity, mapApiError, randomId } = require("./weather-service");
+const {
+  computeWeatherAnomalyBps,
+  fetchWeatherPayload,
+  geocodeCity,
+  mapApiError,
+  randomId,
+} = require("./weather-service");
 
-function createWeatherHandler({ apiKey, fetchImpl = fetch } = {}) {
-  return async function weatherHandler(req, res) {
+const WEATHER_CACHE_CONTROL = "public, max-age=60, stale-while-revalidate=240";
+
+function createEndpointHandler(execute, { cacheControl = null } = {}) {
+  return async function endpointHandler(req, res) {
     if (res && typeof res.status === "function") {
       const requestId = req.headers?.["x-request-id"] || randomId();
       try {
-        const payload = await fetchWeatherPayload({
-          apiKey,
-          lat: req.query?.lat,
-          lon: req.query?.lon,
-          fetchImpl,
+        const body = await execute({
+          query: req.query || {},
           ipAddress: req.ip || "unknown",
           requestId,
         });
-
-        res
-          .status(200)
-          .set("Cache-Control", "public, max-age=60, stale-while-revalidate=240")
-          .json(payload);
+        if (cacheControl) {
+          res.status(200).set("Cache-Control", cacheControl).json(body);
+        } else {
+          res.status(200).json(body);
+        }
       } catch (error) {
         const mapped = mapApiError(error, requestId);
         res.status(mapped.statusCode).json(mapped.body);
@@ -34,17 +39,19 @@ function createWeatherHandler({ apiKey, fetchImpl = fetch } = {}) {
     const c = req;
     const requestId = c.req.header("x-request-id") || randomId();
     try {
-      const payload = await fetchWeatherPayload({
-        apiKey,
-        lat: c.req.query("lat"),
-        lon: c.req.query("lon"),
-        fetchImpl,
+      const body = await execute({
+        query: {
+          lat: c.req.query("lat"),
+          lon: c.req.query("lon"),
+          q: c.req.query("q"),
+        },
         ipAddress: c.req.header("x-forwarded-for")?.split(",")?.[0]?.trim() || "unknown",
         requestId,
       });
-
-      c.header("Cache-Control", "public, max-age=60, stale-while-revalidate=240");
-      return c.json(payload, 200);
+      if (cacheControl) {
+        c.header("Cache-Control", cacheControl);
+      }
+      return c.json(body, 200);
     } catch (error) {
       const mapped = mapApiError(error, requestId);
       return c.json(mapped.body, mapped.statusCode);
@@ -52,38 +59,47 @@ function createWeatherHandler({ apiKey, fetchImpl = fetch } = {}) {
   };
 }
 
-function createGeocodeHandler({ apiKey, fetchImpl = fetch } = {}) {
-  return async function geocodeHandler(req, res) {
-    if (res && typeof res.status === "function") {
-      const requestId = req.headers?.["x-request-id"] || randomId();
-      try {
-        const results = await geocodeCity({
-          apiKey,
-          query: req.query?.q,
-          fetchImpl,
-        });
-        res.status(200).json({ results, requestId });
-      } catch (error) {
-        const mapped = mapApiError(error, requestId);
-        res.status(mapped.statusCode).json(mapped.body);
-      }
-      return;
-    }
-
-    const c = req;
-    const requestId = c.req.header("x-request-id") || randomId();
-    try {
-      const results = await geocodeCity({
+function createWeatherHandler({ apiKey, fetchImpl = fetch } = {}) {
+  return createEndpointHandler(
+    ({ query, ipAddress, requestId }) =>
+      fetchWeatherPayload({
         apiKey,
-        query: c.req.query("q"),
+        lat: query.lat,
+        lon: query.lon,
         fetchImpl,
+        ipAddress,
+        requestId,
+      }),
+    { cacheControl: WEATHER_CACHE_CONTROL },
+  );
+}
+
+function createGeocodeHandler({ apiKey, fetchImpl = fetch } = {}) {
+  return createEndpointHandler(async ({ query, requestId }) => {
+    const results = await geocodeCity({
+      apiKey,
+      query: query.q,
+      fetchImpl,
+    });
+    return { results, requestId };
+  });
+}
+
+function createB2bAnomalyHandler({ apiKey, fetchImpl = fetch } = {}) {
+  return createEndpointHandler(
+    async ({ query, ipAddress, requestId }) => {
+      const payload = await fetchWeatherPayload({
+        apiKey,
+        lat: query.lat,
+        lon: query.lon,
+        fetchImpl,
+        ipAddress,
+        requestId,
       });
-      return c.json({ results, requestId }, 200);
-    } catch (error) {
-      const mapped = mapApiError(error, requestId);
-      return c.json(mapped.body, mapped.statusCode);
-    }
-  };
+      return computeWeatherAnomalyBps(payload);
+    },
+    { cacheControl: WEATHER_CACHE_CONTROL },
+  );
 }
 
 function createApp({ apiKey, fetchImpl = fetch, liveReloadMiddleware = null } = {}) {
@@ -152,9 +168,11 @@ function createApp({ apiKey, fetchImpl = fetch, liveReloadMiddleware = null } = 
 
   const weatherHandler = createWeatherHandler({ apiKey, fetchImpl });
   const geocodeHandler = createGeocodeHandler({ apiKey, fetchImpl });
+  const b2bAnomalyHandler = createB2bAnomalyHandler({ apiKey, fetchImpl });
 
   app.get("/api/weather", (c) => weatherHandler(c));
   app.get("/api/geocode", (c) => geocodeHandler(c));
+  app.get("/api/v2/b2b/anomaly", (c) => b2bAnomalyHandler(c));
 
   const getIndexHtml = () => {
     const indexPath = path.join(__dirname, "..", "index.html");
@@ -184,4 +202,5 @@ module.exports = {
   createApp,
   createWeatherHandler,
   createGeocodeHandler,
+  createB2bAnomalyHandler,
 };

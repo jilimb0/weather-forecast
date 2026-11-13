@@ -30,6 +30,13 @@ function randomId() {
 }
 
 function parseCoordinate(value, label) {
+  if (value === null || value === undefined || (typeof value === "string" && value.trim() === "")) {
+    const err = new Error(`${label} must be a valid number`);
+    err.statusCode = 400;
+    err.code = "INVALID_COORDINATE";
+    throw err;
+  }
+
   const num = Number(value);
   if (!Number.isFinite(num)) {
     const err = new Error(`${label} must be a valid number`);
@@ -226,6 +233,7 @@ function normalizeWeatherPayload(currentData, forecastData, units = "metric") {
   }
 
   const daily = dailyKeys.map((key) => aggregateDay(grouped.get(key), timezoneOffsetSec));
+  const precipitationMmPerHour = Math.max(0, resolvePrecipitationMmPerHour(currentData));
 
   return {
     location: {
@@ -244,6 +252,7 @@ function normalizeWeatherPayload(currentData, forecastData, units = "metric") {
         speed: currentData.wind?.speed ?? 0,
         deg: currentData.wind?.deg ?? 0,
       },
+      precipitationMmPerHour,
       pressure: currentData.main.pressure,
       visibility: currentData.visibility,
       condition: currentData.weather?.[0]?.main || "Clouds",
@@ -415,6 +424,73 @@ async function geocodeCity({ apiKey, query, fetchImpl = fetch }) {
   return results;
 }
 
+const BPS_SCALE = 10000;
+const MIN_ANOMALY_FACTOR_BPS = 6500;
+const MAX_ANOMALY_FACTOR_BPS = 10000;
+
+function resolvePrecipitationMmPerHour(source = {}) {
+  if (source.precipitationMmPerHour != null) {
+    return Number(source.precipitationMmPerHour) || 0;
+  }
+  const rain1h =
+    source.rain?.["1h"] ?? (source.rain?.["3h"] != null ? Number(source.rain["3h"]) / 3 : 0);
+  const snow1h =
+    source.snow?.["1h"] ?? (source.snow?.["3h"] != null ? Number(source.snow["3h"]) / 3 : 0);
+  return Number(rain1h || 0) + Number(snow1h || 0);
+}
+
+function toNonNegativeBps(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) {
+    return 0;
+  }
+  return Math.round(num * BPS_SCALE);
+}
+
+/**
+ * Convert a normalized weather payload into integer basis-point anomaly telemetry.
+ * Coordinates are rounded to 2 decimal places per ADR-0002 privacy rules.
+ */
+function computeWeatherAnomalyBps(payload) {
+  const rawLat = payload?.location?.lat;
+  const rawLon = payload?.location?.lon;
+  const latRounded =
+    rawLat != null && Number.isFinite(Number(rawLat)) ? roundCoord(Number(rawLat)) : null;
+  const lonRounded =
+    rawLon != null && Number.isFinite(Number(rawLon)) ? roundCoord(Number(rawLon)) : null;
+
+  const current = payload?.current || {};
+  const precipitationMmPerHourBps = toNonNegativeBps(resolvePrecipitationMmPerHour(current));
+  const windSpeedMsBps = toNonNegativeBps(current.wind?.speed ?? 0);
+
+  // Penalize precipitation above 1.0 mm/h (10,000 bps) and wind above 8.0 m/s (80,000 bps)
+  // so heavy rain/wind maps deterministically into 6500..8500 bps.
+  const excessRainBps = Math.max(0, precipitationMmPerHourBps - 10000);
+  const excessWindBps = Math.max(0, windSpeedMsBps - 80000);
+  const rainPenaltyBps = Math.min(2500, Math.round(excessRainBps / 45));
+  const windPenaltyBps = Math.min(2500, Math.round(excessWindBps / 40));
+
+  const weatherAnomalyFactorBps = Math.max(
+    MIN_ANOMALY_FACTOR_BPS,
+    Math.min(MAX_ANOMALY_FACTOR_BPS, MAX_ANOMALY_FACTOR_BPS - rainPenaltyBps - windPenaltyBps),
+  );
+
+  return {
+    latRounded,
+    lonRounded,
+    precipitationMmPerHourBps,
+    precipitationBps: precipitationMmPerHourBps,
+    windSpeedMsBps,
+    windSpeedBps: windSpeedMsBps,
+    weatherAnomalyFactorBps,
+    isWeatherCacheStale: Boolean(payload?.meta?.stale),
+    condition: current.condition || "Unknown",
+    fetchedAt: payload?.meta?.fetchedAt || null,
+    source: payload?.meta?.source || "openweather",
+    ...(payload?.meta?.requestId ? { requestId: payload.meta.requestId } : {}),
+  };
+}
+
 function mapApiError(error, requestId) {
   if (error.statusCode && error.code) {
     return {
@@ -446,6 +522,7 @@ module.exports = {
   normalizeWeatherPayload,
   fetchWeatherPayload,
   geocodeCity,
+  computeWeatherAnomalyBps,
   mapApiError,
   randomId,
 };
