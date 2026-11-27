@@ -13,6 +13,7 @@ Resilience hardening, server migration to Hono, and architecture governance.
 
 ### Server & Security
 - Migrated standalone Node runtime from Express 5 to Hono (`@hono/node-server`)
+- Added internal B2B weather anomaly feed (`GET /api/v2/b2b/anomaly`) computing deterministic integer basis-point telemetry (`precipitationMmPerHourBps`, `windSpeedMsBps`, `weatherAnomalyFactorBps` in `6500..10000`, `isWeatherCacheStale`, and 2-decimal coordinate rounding) for `BA` and `C&TLab`
 - Uniform defensive security headers (CSP, X-Content-Type-Options, X-Frame-Options, Permissions-Policy, Referrer-Policy)
 - Request-ID and X-Correlation-ID end-to-end tracing
 - Sentry header and query parameter redaction

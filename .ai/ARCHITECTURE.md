@@ -17,6 +17,7 @@ weather-forecast — Resilient offline-first weather forecasting progressive web
 
 ## 4. Data Flows & External Boundaries
 - Inbound requests are validated at perimeter boundaries using strict schemas.
+- `GET /api/v2/b2b/anomaly?lat={number}&lon={number}` (`src/server.js`, `computeWeatherAnomalyBps` in `src/weather-service.js`) serves an integer basis-point (`bps`, 10,000 scale) weather anomaly feed (`precipitationMmPerHourBps`, `windSpeedMsBps`, `weatherAnomalyFactorBps` clamped to `6500..10000`, `latRounded`/`lonRounded` at 2 decimals, `isWeatherCacheStale`) for internal `BA` and `C&TLab` consumers.
 - Outbound third-party calls must employ timeouts, retries with backoff, and circuit breakers.
 - Zero secrets or unredacted customer PII in logs or storage snapshots.
 

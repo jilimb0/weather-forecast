@@ -2,14 +2,15 @@
 
 Production-ready weather application with a modern editorial-glass UI, Netlify Function backend, and PWA offline support.
 
-## Monetization & Billing
+## Monetization & Ecosystem Role
 
-- **Stripe & Telegram Stars Paywall**: Tiered subscription for high-resolution Doppler radar, hyper-local storm alerts, and minute-by-minute precipitation forecasting.
-- **CryptoBot & Merchant of Record**: Automated paywall and webhook billing infrastructure for commercial API usage and historical data export.
+- **Free Zero-Dep Showcase PWA:** Public, dependency-free editorial-glass weather forecast PWA (`index.html`, Vanilla JS + Service Worker) with offline fallback and zero paywall.
+- **Internal B2B Weather Anomaly Microservice:** Serves deterministic integer basis-point weather telemetry (`GET /api/v2/b2b/anomaly`) consumed internally by **`BA`** and **`C&TLab`** for pricing, delivery, and demand-anomaly modeling.
 
 ## What this version includes
 
 - Stable public API contract at `GET /api/weather?lat={number}&lon={number}`
+- Internal B2B weather anomaly feed at `GET /api/v2/b2b/anomaly?lat={number}&lon={number}` (integer basis-point telemetry for `BA` and `C&TLab`)
 - V2 normalized weather payload:
   - `location`
   - `current`
@@ -93,6 +94,32 @@ Production-ready weather application with a modern editorial-glass UI, Netlify F
 }
 ```
 
+### B2B Weather Anomaly Feed (`BA` & `C&TLab`)
+
+`GET /api/v2/b2b/anomaly?lat=41.7151&lon=44.8271`
+
+Returns deterministic integer basis-point (`bps`, `10000` scale) telemetry computed by `computeWeatherAnomalyBps` (`src/weather-service.js`) with 2-decimal coordinate rounding (`latRounded`, `lonRounded`):
+
+```json
+{
+  "latRounded": 41.72,
+  "lonRounded": 44.83,
+  "precipitationMmPerHourBps": 125000,
+  "precipitationBps": 125000,
+  "windSpeedMsBps": 164000,
+  "windSpeedBps": 164000,
+  "weatherAnomalyFactorBps": 6500,
+  "isWeatherCacheStale": false,
+  "condition": "Rain",
+  "fetchedAt": "2026-04-14T09:00:00.000Z",
+  "source": "openweather",
+  "requestId": "abc123"
+}
+```
+
+- `weatherAnomalyFactorBps` is clamped to `6500..10000` (penalizing precipitation > 1.0 mm/h and wind > 8.0 m/s, each capped at 2,500 bps).
+- Shares coordinate validation (`400 INVALID_COORDINATE`), rate-limiting (`429`), circuit breaker (`502`), and `Cache-Control` headers with `/api/weather`.
+
 ## Local development
 
 1. Install dependencies:
@@ -154,5 +181,3 @@ Architectural decisions follow the Agent-Optimized ADR protocol and are indexed 
 - [ADR-0001: Zero-Dependency Vanilla JS Runtime, OpenWeather Circuit Breaker & Stale-While-Revalidate Cache](.ai/adr/0001-openweather-circuit-breaker-and-stale-while-revalidate.md)
 - [ADR-0002: Forecast Normalization Pipeline (/weather + /forecast)](.ai/adr/0002-forecast-normalization-pipeline.md)
 - [ADR-0003: Unified Hono and Netlify Functions Runtime Architecture](.ai/adr/0003-hono-and-netlify-functions-runtime.md)
-
-Historical ADR records are cross-referenced in `docs/adr/`.
